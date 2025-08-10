@@ -1,3 +1,14 @@
 from django.contrib import admin
+from .models import (
+    ServiceRequest,
+    Guide,
+    UserReview,
+)
 
-# Register your models here.
+admin.site.register(
+    [
+        ServiceRequest,
+        Guide,
+        UserReview,
+    ]
+)
