@@ -1,24 +1,32 @@
-from django.shortcuts import render
+import httpx
+import asyncio
+from django.conf import settings
+from django_filters.rest_framework import DjangoFilterBackend
 
 # Create your views here.
 # views.py
-from rest_framework import generics, status, filters
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework import filters, generics
 from rest_framework.pagination import PageNumberPagination
-from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Count, Avg, Q
-from django.utils import timezone
-from datetime import timedelta
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
-from .models import ServiceRequest, Guide, UserReview
+from .models import Guide, ServiceRequest, UserReview
 from .serializers import (
-    ServiceRequestSerializer,
-    GuideListSerializer,
     GuideDetailSerializer,
+    GuideListSerializer,
+    ServiceRequestSerializer,
     UserReviewSerializer,
 )
+
+CHAT_ID = settings.CHAT_ID
+BOT_TOKEN = settings.BOT_TOKEN
+
+
+async def send_telegram_message(text: str):
+    url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
+    payload = {'chat_id': CHAT_ID, 'text': text}
+    async with httpx.AsyncClient() as client:
+        await client.post(url, data=payload)
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -36,7 +44,29 @@ class ServiceRequestCreateView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
-        serializer.save()
+        instance = serializer.save()
+        # Format message with emojis
+        message = (
+            f'📩 New Submission\n\n'
+            f'👤 Full Name: {instance.full_name}\n'
+            f'📧 Email: {instance.email_address}\n'
+            f'📱 Phone: {instance.phone_number}\n'
+            f'🏳️ Country Code: {instance.country_code}\n'
+            f'🛠️ Services Needed: {instance.services_needed}\n'
+            f'📍 Location: {instance.location}\n'
+            f'💰 Estimated Budget: {instance.estimated_budget}\n'
+            f'📜 Detailed Requirements: {instance.detailed_requirements}\n'
+            f'📝 Additional Info: {instance.additional_information}\n'
+            f'🏢 Business Type: {instance.business_type}\n'
+            f'📋 Business Requirements: {instance.business_requirements}\n'
+            f'🕒 Created At: {instance.created_at}\n'
+            f'♻️ Updated At: {instance.updated_at}\n'
+            f'✅ Processed: {instance.is_processed}\n'
+            f'📌 Status: {instance.status}'
+        )
+
+        # Send Telegram notification
+        asyncio.run(send_telegram_message(message))
 
 
 # Helpful Guides Views

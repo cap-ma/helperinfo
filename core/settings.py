@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -77,6 +78,7 @@ TEMPLATES = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+    'https://localshelp.uz',
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
@@ -169,3 +171,7 @@ CKEDITOR_CONFIGS = {
         'extraPlugins': 'uploadimage,image2',
     }
 }
+
+
+CHAT_ID = config('CHAT_ID')
+BOT_TOKEN = config('BOT_TOKEN')
