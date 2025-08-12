@@ -79,6 +79,7 @@ TEMPLATES = [
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'https://localshelp.uz',
+    'http://localshelp.uz',
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
