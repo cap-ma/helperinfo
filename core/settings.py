@@ -80,7 +80,18 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'https://localshelp.uz',
     'http://localshelp.uz',
+    'https://www.localshelp.uz',
+    'http://www.localshelp.uz',
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'https://localshelp.uz',
+    'http://localshelp.uz',
+    'https://www.localshelp.uz',
+    'http://www.localshelp.uz',
+]
+
 
 WSGI_APPLICATION = 'core.wsgi.application'
 

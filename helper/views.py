@@ -1,6 +1,11 @@
-import httpx
 import asyncio
+
+import httpx
 from django.conf import settings
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_http_methods
 from django_filters.rest_framework import DjangoFilterBackend
 
 # Create your views here.
@@ -27,6 +32,16 @@ async def send_telegram_message(text: str):
     payload = {'chat_id': CHAT_ID, 'text': text}
     async with httpx.AsyncClient() as client:
         await client.post(url, data=payload)
+
+
+@ensure_csrf_cookie
+@require_http_methods(['GET'])
+def get_csrf_token(request):
+    """
+    Get CSRF token for the client
+    """
+    token = get_token(request)
+    return JsonResponse({'csrfToken': token, 'success': True})
 
 
 class StandardResultsSetPagination(PageNumberPagination):
