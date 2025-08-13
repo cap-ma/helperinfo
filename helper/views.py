@@ -30,6 +30,7 @@ BOT_TOKEN = settings.BOT_TOKEN
 async def send_telegram_message(text: str):
     url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
     payload = {'chat_id': CHAT_ID, 'text': text}
+
     async with httpx.AsyncClient() as client:
         await client.post(url, data=payload)
 
@@ -60,14 +61,20 @@ class ServiceRequestCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         instance = serializer.save()
-        # Format message with emojis
+
+        service_text = '\n\n'
+        for service in instance.services_needed:
+            name = service.get('name', '')
+            price = service.get('price', '')
+            service_text += f'🔹 {name}: {price}\n'
+
         message = (
             f'📩 New Submission\n\n'
             f'👤 Full Name: {instance.full_name}\n'
             f'📧 Email: {instance.email_address}\n'
             f'📱 Phone: {instance.phone_number}\n'
             f'🏳️ Country Code: {instance.country_code}\n'
-            f'🛠️ Services Needed: {instance.services_needed}\n'
+            f'🛠️ Services Needed: {service_text}\n'
             f'📍 Location: {instance.location}\n'
             f'💰 Estimated Budget: {instance.estimated_budget}\n'
             f'📜 Detailed Requirements: {instance.detailed_requirements}\n'

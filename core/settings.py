@@ -92,6 +92,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://www.localshelp.uz',
 ]
 
+CORS_ALLOW_CREDENTIALS = True
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
@@ -136,6 +137,9 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 
 # Static files (CSS, JavaScript, Images)
