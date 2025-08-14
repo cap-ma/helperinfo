@@ -1,14 +1,23 @@
 from django.contrib import admin
+from parler.admin import TranslatableAdmin
+from django.utils.text import slugify
+
 from .models import (
-    ServiceRequest,
     Guide,
+    ServiceRequest,
     UserReview,
 )
 
 admin.site.register(
     [
         ServiceRequest,
-        Guide,
         UserReview,
     ]
 )
+
+
+@admin.register(Guide)
+class GuideAdmin(TranslatableAdmin):
+    list_display = ('title', 'category', 'is_published', 'publication_date')
+    search_fields = ('title',)
+    readonly_fields = ('slug',)

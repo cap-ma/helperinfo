@@ -52,8 +52,6 @@ class ServiceRequestSerializer(serializers.ModelSerializer):
 
 # 2
 class GuideListSerializer(serializers.ModelSerializer):
-    """Serializer for listing helpful guides"""
-
     reading_time = serializers.SerializerMethodField()
 
     class Meta:
@@ -72,17 +70,19 @@ class GuideListSerializer(serializers.ModelSerializer):
             'reading_time',
         ]
 
+    def to_representation(self, instance):
+        lang = self.context['request'].GET.get('lang')
+        if lang:
+            instance.set_current_language(lang)
+        return super().to_representation(instance)
+
     def get_reading_time(self, obj):
-        """Estimate reading time based on content length"""
-        # Rough estimate: 200 words per minute
-        word_count = len(obj.content.split())
+        word_count = len((obj.content or '').split())
         return max(1, word_count // 200)
 
 
 # 3
 class GuideDetailSerializer(serializers.ModelSerializer):
-    """Detailed serializer for individual guide view"""
-
     reading_time = serializers.SerializerMethodField()
     related_guides = serializers.SerializerMethodField()
     content = serializers.SerializerMethodField()
@@ -110,30 +110,32 @@ class GuideDetailSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
 
+    def to_representation(self, instance):
+        lang = self.context['request'].GET.get('lang')
+        if lang:
+            print(lang)
+            instance.set_current_language(lang)
+        return super().to_representation(instance)
+
     def get_reading_time(self, obj):
-        """Estimate reading time based on content length"""
-        word_count = len(obj.content.split())
+        word_count = len((obj.content or '').split())
         return max(1, word_count // 200)
 
     def get_related_guides(self, obj):
-        """Get related guides from the same category"""
         related = Guide.objects.filter(
             category=obj.category, is_published=True
         ).exclude(id=obj.id)[:3]
-
-        return GuideListSerializer(related, many=True).data
+        return GuideListSerializer(related, many=True, context=self.context).data
 
     def get_content(self, obj):
         html = obj.content or ''
         request = self.context.get('request')
-
         if not request:
             return html
-        soup = BeautifulSoup(html, 'html.parser')
 
+        soup = BeautifulSoup(html, 'html.parser')
         for img in soup.find_all('img'):
             src = img.get('src', '')
-            print('sdfs')
             if src.startswith('/'):
                 img['src'] = request.build_absolute_uri(src)
         return str(soup)

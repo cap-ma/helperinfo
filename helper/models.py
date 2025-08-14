@@ -1,9 +1,11 @@
+import itertools
+
 from ckeditor_uploader.fields import RichTextUploadingField
-
-
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
+from parler.models import TranslatableModel, TranslatedFields
 
 
 class ServiceRequest(models.Model):
@@ -75,9 +77,7 @@ class ServiceRequest(models.Model):
         return f'{self.full_name} - {self.created_at.strftime("%Y-%m-%d")}'
 
 
-class Guide(models.Model):
-    """Model for helpful guides section"""
-
+class Guide(TranslatableModel):
     GUIDE_CATEGORIES = [
         ('banking_finance', 'Banking & Finance'),
         ('transportation', 'Transportation'),
@@ -89,36 +89,26 @@ class Guide(models.Model):
         ('emergency', 'Emergency Services'),
     ]
 
-    title = models.CharField(max_length=200)
+    translations = TranslatedFields(
+        title=models.CharField(max_length=200),
+        short_description=models.TextField(max_length=300),
+        content=RichTextUploadingField(
+            help_text='Detailed guide content with rich text formatting'
+        ),
+        meta_description=models.CharField(max_length=160, blank=True, null=True),
+        keywords=models.CharField(max_length=200, blank=True, null=True),
+    )
+
     slug = models.SlugField(unique=True)
     category = models.CharField(max_length=30, choices=GUIDE_CATEGORIES)
-    short_description = models.TextField(max_length=300)
-    content = RichTextUploadingField(
-        help_text='Detailed guide content with rich text formatting'
-    )
-
-    # SEO and Meta
-    meta_description = models.CharField(max_length=160, blank=True, null=True)
-    keywords = models.CharField(max_length=200, blank=True, null=True)
-
-    # Featured image
     featured_image = models.ImageField(
-        upload_to='guides/images/',
-        blank=True,
-        null=True,
-        help_text='Featured image for the guide',
+        upload_to='guides/images/', blank=True, null=True
     )
-
-    # Publishing
     is_published = models.BooleanField(default=True)
     is_featured = models.BooleanField(default=False)
     publication_date = models.DateTimeField(default=timezone.now)
-
-    # Engagement metrics
     view_count = models.PositiveIntegerField(default=0)
     likes = models.PositiveIntegerField(default=0)
-
-    # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -128,12 +118,26 @@ class Guide(models.Model):
         verbose_name_plural = 'Guides'
 
     def __str__(self):
-        return self.title
+        return self.safe_translation_getter('title', any_language=True)
 
     def increment_view_count(self):
-        """Increment view count when guide is accessed"""
         self.view_count += 1
         self.save(update_fields=['view_count'])
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            # Base slug from title
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = itertools.count(1)
+
+            # Keep adding suffix until it's unique
+            while Guide.objects.filter(slug=slug).exists():
+                slug = f'{base_slug}-{next(counter)}'
+
+            self.slug = slug
+
+        super().save(*args, **kwargs)
 
 
 class UserReview(models.Model):

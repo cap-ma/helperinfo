@@ -39,12 +39,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # local
+    'helper',
+    # third party
     'rest_framework',
     'django_filters',
     'corsheaders',
     'ckeditor',
     'ckeditor_uploader',
-    'helper',
+    'parler',
 ]
 
 MIDDLEWARE = [
@@ -191,3 +194,28 @@ CKEDITOR_CONFIGS = {
 
 CHAT_ID = config('CHAT_ID')
 BOT_TOKEN = config('BOT_TOKEN')
+
+
+LANGUAGES = [
+    ('en', 'English'),
+    ('ru', 'Russian'),
+    ('fr', 'French'),
+    ('tr', 'Turkish'),
+    ('zh', 'Chinese'),
+    ('ko', 'Korean'),
+]
+
+PARLER_LANGUAGES = {
+    None: (
+        {'code': 'en'},
+        {'code': 'ru'},
+        {'code': 'fr'},
+        {'code': 'tr'},
+        {'code': 'zh'},
+        {'code': 'ko'},
+    ),
+    'default': {
+        'fallbacks': ['en'],
+        'hide_untranslated': False,
+    },
+}

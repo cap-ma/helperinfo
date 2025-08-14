@@ -4,6 +4,7 @@ import httpx
 from django.conf import settings
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
+from django.utils import translation
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from django_filters.rest_framework import DjangoFilterBackend
@@ -108,6 +109,12 @@ class GuideListView(generics.ListAPIView):
     ordering_fields = ['publication_date', 'view_count', 'title']
     ordering = ['-publication_date']
 
+    def initial(self, request, *args, **kwargs):
+        lang = request.GET.get('lang')
+        if lang:
+            translation.activate(lang)
+        return super().initial(request, *args, **kwargs)
+
     def get_queryset(self):
         return Guide.objects.filter(is_published=True)
 
@@ -118,6 +125,12 @@ class GuideDetailView(generics.RetrieveAPIView):
     serializer_class = GuideDetailSerializer
     permission_classes = [AllowAny]
     lookup_field = 'slug'
+
+    def initial(self, request, *args, **kwargs):
+        lang = request.GET.get('lang')
+        if lang:
+            translation.activate(lang)
+        return super().initial(request, *args, **kwargs)
 
     def get_queryset(self):
         return Guide.objects.filter(is_published=True)
