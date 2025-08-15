@@ -1,6 +1,5 @@
 from django.contrib import admin
 from parler.admin import TranslatableAdmin
-from django.utils.text import slugify
 
 from .models import (
     Guide,

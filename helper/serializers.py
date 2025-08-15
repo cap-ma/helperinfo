@@ -71,7 +71,7 @@ class GuideListSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        lang = self.context['request'].GET.get('lang')
+        lang = self.context['request'].GET.get('lang', 'en')
         if lang:
             instance.set_current_language(lang)
         return super().to_representation(instance)
@@ -111,9 +111,8 @@ class GuideDetailSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, instance):
-        lang = self.context['request'].GET.get('lang')
+        lang = self.context['request'].GET.get('lang', 'en')
         if lang:
-            print(lang)
             instance.set_current_language(lang)
         return super().to_representation(instance)
 

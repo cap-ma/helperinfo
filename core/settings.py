@@ -107,6 +107,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'OPTIONS': {
+            'timeout': 10,
+        },
     }
 }
 
@@ -177,17 +180,85 @@ CKEDITOR_BROWSE_SHOW_DIRS = True
 CKEDITOR_RESTRICT_BY_DATE = True
 CKEDITOR_ALLOW_NONIMAGE_FILES = False
 
+
 CKEDITOR_CONFIGS = {
     'default': {
-        'toolbar': 'Custom',
-        'toolbar_Custom': [
-            ['Bold', 'Italic', 'Underline'],
-            ['NumberedList', 'BulletedList'],
-            ['Link', 'Unlink'],
-            ['Image', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar'],
-            ['Source'],
+        'toolbar': 'Full',
+        'toolbar_Full': [
+            # Document
+            ['Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates'],
+            # Clipboard
+            ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'],
+            # Editing
+            ['Find', 'Replace', '-', 'SelectAll', '-', 'Scayt'],
+            # Forms
+            [
+                'Form',
+                'Checkbox',
+                'Radio',
+                'TextField',
+                'Textarea',
+                'Select',
+                'Button',
+                'ImageButton',
+                'HiddenField',
+            ],
+            # Basic Styles
+            [
+                'Bold',
+                'Italic',
+                'Underline',
+                'Strike',
+                'Subscript',
+                'Superscript',
+                '-',
+                'RemoveFormat',
+            ],
+            # Paragraph
+            [
+                'NumberedList',
+                'BulletedList',
+                '-',
+                'Outdent',
+                'Indent',
+                '-',
+                'Blockquote',
+                'CreateDiv',
+                '-',
+                'JustifyLeft',
+                'JustifyCenter',
+                'JustifyRight',
+                'JustifyBlock',
+                '-',
+                'BidiLtr',
+                'BidiRtl',
+            ],
+            # Links
+            ['Link', 'Unlink', 'Anchor'],
+            # Insert
+            [
+                'Image',
+                'Flash',
+                'Table',
+                'HorizontalRule',
+                'Smiley',
+                'SpecialChar',
+                'PageBreak',
+                'Iframe',
+            ],
+            # Styles
+            ['Styles', 'Format', 'Font', 'FontSize'],
+            # Colors
+            ['TextColor', 'BGColor'],
+            # Tools
+            ['Maximize', 'ShowBlocks'],
         ],
-        'extraPlugins': 'uploadimage,image2',
+        'extraPlugins': 'font,colorbutton,justify,iframe,div,smiley',
+        'fontSize_sizes': '8/8px;10/10px;12/12px;14/14px;16/16px;18/18px;20/20px;24/24px;28/28px;36/36px;48/48px;',
+        'width': '100%',
+        'height': 400,
+        'filebrowserBrowseUrl': '/ckeditor/browse/',
+        'filebrowserUploadUrl': '/ckeditor/upload/',
     }
 }
 
