@@ -109,12 +109,6 @@ class GuideListView(generics.ListAPIView):
     ordering_fields = ['publication_date', 'view_count', 'title']
     ordering = ['-publication_date']
 
-    def initial(self, request, *args, **kwargs):
-        lang = request.GET.get('lang')
-        if lang:
-            translation.activate(lang)
-        return super().initial(request, *args, **kwargs)
-
     def get_queryset(self):
         return Guide.objects.filter(is_published=True)
 
@@ -125,12 +119,6 @@ class GuideDetailView(generics.RetrieveAPIView):
     serializer_class = GuideDetailSerializer
     permission_classes = [AllowAny]
     lookup_field = 'slug'
-
-    def initial(self, request, *args, **kwargs):
-        lang = request.GET.get('lang')
-        if lang:
-            translation.activate(lang)
-        return super().initial(request, *args, **kwargs)
 
     def get_queryset(self):
         return Guide.objects.filter(is_published=True)
